@@ -940,6 +940,42 @@ def TypeTagForDatatype : InheritableAttr {
   let Subjects = [Var];
 }
 
+// Thread Role Analysis-related attributes
+
+def ThreadRoleDecl : InheritableAttr {
+  let Spellings = [CXX11<"cert", "thread_role_decl">];
+  let Args = [StringArgument<"Decls">];
+}
+
+def ThreadRole : InheritableAttr {
+  let Spellings = [CXX11<"cert", "thread_role">];
+  let Args = [StringArgument<"Expr">];
+  let Subjects = [Function];
+}
+
+def ThreadRoleGrant : Attr {
+  let Spellings = [CXX11<"cert", "thread_role_grant">];
+  let Args = [StringArgument<"RoleList">];
+  let Subjects = [CompoundStmt];
+}
+
+def ThreadRoleRevoke : Attr {
+  let Spellings = [CXX11<"cert", "thread_role_revoke">];
+  let Args = [StringArgument<"RoleList">];
+  let Subjects = [CompoundStmt];
+}
+
+def ThreadRoleIncompatible : Attr {
+  let Spellings = [CXX11<"cert", "thread_role_incompatible">];
+  let Args = [StringArgument<"RoleList">];
+}
+
+def ThreadRoleUnique : Attr {
+  let Spellings = [CXX11<"cert", "thread_role_unique">];
+  let Args = [StringArgument<"RoleList">];                   
+}
+
+
 // Microsoft-related attributes
 
 def MsProperty : Attr {
