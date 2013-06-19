@@ -35,11 +35,11 @@ const ASTNodeKind::KindInfo ASTNodeKind::AllKindInfo[] = {
 #include "clang/AST/TypeNodes.def"
 };
 
-bool ASTNodeKind::isBaseOf(ASTNodeKind Other) const {
+bool ASTNodeKind::isBaseOf(ASTNodeKind Other) {
   return isBaseOf(KindId, Other.KindId);
 }
 
-bool ASTNodeKind::isSame(ASTNodeKind Other) const {
+bool ASTNodeKind::isSame(ASTNodeKind Other) {
   return KindId != NKI_None && KindId == Other.KindId;
 }
 

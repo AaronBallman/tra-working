@@ -43,10 +43,10 @@ public:
   }
 
   /// \brief Returns \c true if \c this and \c Other represent the same kind.
-  bool isSame(ASTNodeKind Other) const;
+  bool isSame(ASTNodeKind Other);
 
   /// \brief Returns \c true if \c this is a base kind of (or same as) \c Other
-  bool isBaseOf(ASTNodeKind Other) const;
+  bool isBaseOf(ASTNodeKind Other);
 
   /// \brief String representation of the kind.
   StringRef asStringRef() const;
@@ -197,14 +197,13 @@ private:
 
   /// \brief Stores the data of the node.
   ///
-  /// Note that we can store \c Decls, \c Stmts, \c Types and
-  /// \c NestedNameSpecifiers by pointer as they are guaranteed to be unique
-  /// pointers pointing to dedicated storage in the AST. \c QualTypes on the
-  /// other hand do not have storage or unique pointers and thus need to be
-  /// stored by value.
-  llvm::AlignedCharArrayUnion<Decl *, Stmt *, Type *, NestedNameSpecifier *,
-                              NestedNameSpecifierLoc, QualType, TypeLoc>
-      Storage;
+  /// Note that we can store \c Decls and \c Stmts by pointer as they are
+  /// guaranteed to be unique pointers pointing to dedicated storage in the
+  /// AST. \c QualTypes on the other hand do not have storage or unique
+  /// pointers and thus need to be stored by value.
+  llvm::AlignedCharArrayUnion<Decl *, Stmt *, NestedNameSpecifier *,
+                              NestedNameSpecifierLoc, QualType, Type *,
+                              TypeLoc> Storage;
 };
 
 // FIXME: Pull out abstraction for the following.
@@ -320,10 +319,6 @@ inline const void *DynTypedNode::getMemoizationData() const {
     return BaseConverter<Decl>::get(NodeKind, Storage.buffer);
   } else if (ASTNodeKind::getFromNodeKind<Stmt>().isBaseOf(NodeKind)) {
     return BaseConverter<Stmt>::get(NodeKind, Storage.buffer);
-  } else if (ASTNodeKind::getFromNodeKind<Type>().isBaseOf(NodeKind)) {
-    return BaseConverter<Type>::get(NodeKind, Storage.buffer);
-  } else if (ASTNodeKind::getFromNodeKind<NestedNameSpecifier>().isBaseOf(NodeKind)) {
-    return BaseConverter<NestedNameSpecifier>::get(NodeKind, Storage.buffer);
   }
   return NULL;
 }
