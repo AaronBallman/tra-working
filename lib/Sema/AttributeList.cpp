@@ -138,3 +138,15 @@ unsigned AttributeList::getAttributeSpellingListIndex() const {
 
 }
 
+std::string AttributeList::getFullName() const {
+  SmallString<64> Buf;
+  if (ScopeName)
+    Buf += ScopeName->getName();
+
+  if (ScopeName || SyntaxUsed == AS_CXX11)
+    Buf += "::";
+
+  Buf += getName()->getName();
+
+  return Buf.str().str();
+}

@@ -3313,7 +3313,7 @@ LexNextToken:
     if (LangOpts.Digraphs && Char == '>') {
       Kind = tok::r_square; // ':>' -> ']'
       CurPtr = ConsumeChar(CurPtr, SizeTmp, Result);
-    } else if (LangOpts.CPlusPlus && Char == ':') {
+    } else if ((LangOpts.CXXAttributes || LangOpts.CPlusPlus) && Char == ':') {
       Kind = tok::coloncolon;
       CurPtr = ConsumeChar(CurPtr, SizeTmp, Result);
     } else {

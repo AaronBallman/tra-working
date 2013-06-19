@@ -24,3 +24,6 @@
 
 // RUN: %clang -target armv7-apple-darwin10 -### -S -mno-implicit-float -mimplicit-float %s 2>&1 | FileCheck -check-prefix=TEST8 %s
 // TEST8-NOT: "-no-implicit-float"
+
+// RUN: %clang -target i386-apple-darwin9 -### -S -fcxx-attributes %s 2>&1 | FileCheck -check-prefix=TEST9 %s
+// TEST9: "-fcxx-attributes"

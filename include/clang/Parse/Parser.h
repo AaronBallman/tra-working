@@ -1900,7 +1900,8 @@ private:
                              AttributeList::Syntax Syntax);
 
   void MaybeParseCXX11Attributes(Declarator &D) {
-    if (getLangOpts().CPlusPlus11 && isCXX11AttributeSpecifier()) {
+    if ((getLangOpts().CPlusPlus11 || getLangOpts().CXXAttributes)
+        && isCXX11AttributeSpecifier()) {
       ParsedAttributesWithRange attrs(AttrFactory);
       SourceLocation endLoc;
       ParseCXX11Attributes(attrs, &endLoc);
@@ -1908,8 +1909,9 @@ private:
     }
   }
   void MaybeParseCXX11Attributes(ParsedAttributes &attrs,
-                                 SourceLocation *endLoc = 0) {
-    if (getLangOpts().CPlusPlus11 && isCXX11AttributeSpecifier()) {
+                                SourceLocation *endLoc = 0) {
+    if ((getLangOpts().CPlusPlus11 || getLangOpts().CXXAttributes)
+        && isCXX11AttributeSpecifier()) {
       ParsedAttributesWithRange attrsWithRange(AttrFactory);
       ParseCXX11Attributes(attrsWithRange, endLoc);
       attrs.takeAllFrom(attrsWithRange);
@@ -1918,8 +1920,8 @@ private:
   void MaybeParseCXX11Attributes(ParsedAttributesWithRange &attrs,
                                  SourceLocation *endLoc = 0,
                                  bool OuterMightBeMessageSend = false) {
-    if (getLangOpts().CPlusPlus11 &&
-        isCXX11AttributeSpecifier(false, OuterMightBeMessageSend))
+    if ((getLangOpts().CPlusPlus11 || getLangOpts().CXXAttributes)
+        && isCXX11AttributeSpecifier(false, OuterMightBeMessageSend))
       ParseCXX11Attributes(attrs, endLoc);
   }
 

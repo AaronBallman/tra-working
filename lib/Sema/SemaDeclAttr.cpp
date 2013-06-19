@@ -4720,6 +4720,123 @@ static void handleSelectAnyAttr(Sema &S, Decl *D, const AttributeList &Attr) {
 }
 
 //===----------------------------------------------------------------------===//
+// Thread Role Analysis specific attribute handlers.
+//===----------------------------------------------------------------------===//
+
+
+bool Sema::CheckThreadRoleListCommon(const AttributeList &Attr,
+                                     StringRef &Role) {
+  assert(!Attr.isInvalid());
+  if (!checkAttributeNumArgs(*this, Attr, 1))
+    return true;
+
+  // Make sure that there is a string literal as the sections's single
+  // argument.
+  Expr *ArgExpr = Attr.getArg(0);
+  ArgExpr = ArgExpr->IgnoreParenCasts();
+  StringLiteral *SE = dyn_cast<StringLiteral>(ArgExpr);
+
+  if (!SE || !SE->isAscii()) {
+    Diag(Attr.getLoc(), diag::err_attribute_argument_n_not_string)
+      << Attr.getFullName() << 1;
+    return true;
+  }
+  
+  // Check that string is a non-empty, comma-separated list of plausible thread
+  // role names.
+  if (SE->getLength() == 0) {
+    Diag(Attr.getLoc(), diag::err_thread_role_empty_list)
+      << Attr.getFullName();    
+    return true;
+  }
+
+  // Parse out the comma separated values.
+  SmallVector<StringRef,2> Roles;
+  SE->getString().split(Roles, ",");
+  
+  llvm::StringMap<bool> Uniquer;
+  bool FoundErrors = false;
+  for (SmallVector<StringRef, 2>::iterator I = Roles.begin(), E = Roles.end();
+       I != E; ++I) {
+    const std::string ARole = (*I).trim();
+    llvm::errs() << '"' << ARole.c_str() << '"' << '\n';
+    
+    if (ARole.length() == 0) {
+      FoundErrors = false;
+      Diag(Attr.getLoc(), diag::err_threadrole_malformed_rolename)
+        << ARole << Attr.getFullName();
+    } else {
+      // Ensure that the args lack duplicates
+      bool &inserted = Uniquer[ARole];
+      if (inserted) {
+        FoundErrors = false;
+        // Found a duplicate role
+        Diag(Attr.getLoc(), diag::err_thread_role_no_duplicates)
+          << ARole << Attr.getFullName();
+        
+        continue;
+      }
+      inserted = true;
+      
+      // TODO: ??Build knowledge of names, both declared and not??
+      // not yet...
+    }
+  }
+
+  Role = SE->getString();
+  return FoundErrors;
+}
+
+static void handleThreadRoleIncompatibleAttr(Sema &S, Decl *D,
+                                             const AttributeList &Attr) {
+  StringRef SR;
+  if (!S.CheckThreadRoleListCommon(Attr, SR))
+    D->addAttr(::new (S.Context) ThreadRoleIncompatibleAttr(Attr.getRange(),
+                                                            S.Context, SR));
+}
+
+static void handleThreadRoleUniqueAttr(Sema &S, Decl *D,
+                                      const AttributeList &Attr) {
+  StringRef SR;
+  if (!S.CheckThreadRoleListCommon(Attr, SR))
+    D->addAttr(::new (S.Context) ThreadRoleUniqueAttr(Attr.getRange(),
+                                                      S.Context, SR));
+}
+
+enum ThreadRoleSubPartKind {
+  TR_Leaf,
+  TR_Opt_BinOp_Expr,
+  TR_SubExp,
+  TR_Expr
+};
+
+static void handleThreadRoleDeclAttr(Sema &S, Decl *D,
+                                     const AttributeList &Attr) {
+  StringRef SR;
+  if (S.CheckThreadRoleListCommon(Attr, SR))
+    return;
+  
+//  if (!isFunctionOrMethod(D))
+//    S.Diag(Attr.getLoc(), diag::err_attribute_wrong_decl_type)
+//    << Attr.getRange() << Attr.getName() << ExpectedFunctionOrMethod;
+  
+  D->addAttr(::new (S.Context) ThreadRoleDeclAttr(Attr.getRange(), S.Context,
+                                                  SR));
+}
+
+static void handleThreadRoleAttr(Sema &S, Decl *D, const AttributeList &Attr) {
+  StringRef SR;
+  if (S.CheckThreadRoleListCommon(Attr, SR))
+    return;
+
+  if (!isFunctionOrMethod(D))
+    S.Diag(Attr.getLoc(), diag::err_attribute_wrong_decl_type)
+    << Attr.getRange() << Attr.getFullName() << ExpectedFunctionOrMethod;
+  
+  D->addAttr(::new (S.Context) ThreadRoleAttr(Attr.getRange(), S.Context, SR));
+}
+
+//===----------------------------------------------------------------------===//
 // Top Level Sema Entry Points
 //===----------------------------------------------------------------------===//
 
@@ -5020,6 +5137,20 @@ static void ProcessInheritableDeclAttr(Sema &S, Scope *scope, Decl *D,
     break;
   case AttributeList::AT_AcquiredAfter:
     handleAcquiredAfterAttr(S, D, Attr);
+    break;
+      
+  // Thread Role Analysis Attributes
+  case AttributeList::AT_ThreadRoleDecl:
+    handleThreadRoleDeclAttr(S, D, Attr);
+    break;
+  case AttributeList::AT_ThreadRole:
+    handleThreadRoleAttr(S, D, Attr);
+    break;
+  case AttributeList::AT_ThreadRoleUnique:
+    handleThreadRoleUniqueAttr(S, D, Attr);
+    break;
+  case AttributeList::AT_ThreadRoleIncompatible:
+    handleThreadRoleIncompatibleAttr(S, D, Attr);
     break;
 
   // Type safety attributes.
