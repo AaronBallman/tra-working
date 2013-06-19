@@ -759,7 +759,7 @@ TEST_F(FormatTest, RemovesTrailingWhitespaceOfComments) {
 }
 
 TEST_F(FormatTest, UnderstandsBlockComments) {
-  verifyFormat("f(/*noSpaceAfterParameterNamingComment=*/true);");
+  verifyFormat("f(/*test=*/ true);");
   EXPECT_EQ(
       "f(aaaaaaaaaaaaaaaaaaaaaaaaa, /* Trailing comment for aa... */\n"
       "  bbbbbbbbbbbbbbbbbbbbbbbbb);",
@@ -844,23 +844,6 @@ TEST_F(FormatTest, CorrectlyHandlesLengthOfBlockComments) {
             "              aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa */",
             format("double *x; /* aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"
                    "              aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa */"));
-  EXPECT_EQ(
-      "void ffffffffffff(\n"
-      "    int aaaaaaaa, int bbbbbbbb,\n"
-      "    int cccccccccccc) { /*\n"
-      "                           aaaaaaaaaa\n"
-      "                           aaaaaaaaaaaaa\n"
-      "                           bbbbbbbbbbbbbb\n"
-      "                           bbbbbbbbbb\n"
-      "                         */\n"
-      "}",
-      format("void ffffffffffff(int aaaaaaaa, int bbbbbbbb, int cccccccccccc)\n"
-             "{ /*\n"
-             "     aaaaaaaaaa aaaaaaaaaaaaa\n"
-             "     bbbbbbbbbbbbbb bbbbbbbbbb\n"
-             "   */\n"
-             "}",
-             getLLVMStyleWithColumns(40)));
 }
 
 TEST_F(FormatTest, SplitsLongCxxComments) {
