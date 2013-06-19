@@ -377,6 +377,8 @@ def fconstexpr_backtrace_limit_EQ : Joined<["-"], "fconstexpr-backtrace-limit=">
                                     Group<f_Group>;
 def fno_crash_diagnostics : Flag<["-"], "fno-crash-diagnostics">, Group<f_clang_Group>, Flags<[NoArgumentUnused]>;
 def fcreate_profile : Flag<["-"], "fcreate-profile">, Group<f_Group>;
+def fcxx_attributes : Flag<["-"], "fcxx-attributes">, Group<f_Group>,
+  HelpText<"Allow C++11-style attributes as a language extension">, Flags<[CC1Option]>;
 def fcxx_exceptions: Flag<["-"], "fcxx-exceptions">, Group<f_Group>,
   HelpText<"Enable C++ exceptions">, Flags<[CC1Option]>;
 def fcxx_modules : Flag <["-"], "fcxx-modules">, Group<f_Group>, Flags<[NoForward]>;

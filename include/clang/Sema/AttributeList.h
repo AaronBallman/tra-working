@@ -290,6 +290,10 @@ public:
   
   IdentifierInfo *getParameterName() const { return ParmName; }
   SourceLocation getParameterLoc() const { return ParmLoc; }
+  
+  /// If the name is qualified, this returns the fully-qualified name,
+  /// otherwise it returns the base attribute name.
+  std::string getFullName() const;
 
   /// Is this the Microsoft __declspec(property) attribute?
   bool isDeclspecPropertyAttribute() const  {

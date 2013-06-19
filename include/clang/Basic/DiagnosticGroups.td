@@ -472,6 +472,13 @@ def ThreadSafety : DiagGroup<"thread-safety",
                               ThreadSafetyPrecise]>;
 def ThreadSafetyBeta : DiagGroup<"thread-safety-beta">;
 
+// Thread Role Analysis warnings
+def ThreadRoleAttributes : DiagGroup<"thread-role-attributes">;
+def ThreadRoleAnalysis   : DiagGroup<"thread-role-analysis">;
+def ThreadRoles : DiagGroup<"ThreadRoles",
+                            [ThreadRoleAttributes,
+                             ThreadRoleAnalysis]>;
+
 // Note that putting warnings in -Wall will not disable them by default. If a
 // warning should be active _only_ when -Wall is passed in, mark it as
 // DefaultIgnore in addition to putting it here.
