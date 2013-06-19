@@ -4759,17 +4759,16 @@ bool Sema::CheckThreadRoleListCommon(const AttributeList &Attr,
   for (SmallVector<StringRef, 2>::iterator I = Roles.begin(), E = Roles.end();
        I != E; ++I) {
     const std::string ARole = (*I).trim();
-    llvm::errs() << '"' << ARole.c_str() << '"' << '\n';
     
     if (ARole.length() == 0) {
-      FoundErrors = false;
+      FoundErrors = true;
       Diag(Attr.getLoc(), diag::err_threadrole_malformed_rolename)
         << ARole << Attr.getFullName();
     } else {
       // Ensure that the args lack duplicates
       bool &inserted = Uniquer[ARole];
       if (inserted) {
-        FoundErrors = false;
+        FoundErrors = true;
         // Found a duplicate role
         Diag(Attr.getLoc(), diag::err_thread_role_no_duplicates)
           << ARole << Attr.getFullName();
@@ -4778,8 +4777,6 @@ bool Sema::CheckThreadRoleListCommon(const AttributeList &Attr,
       }
       inserted = true;
       
-      // TODO: ??Build knowledge of names, both declared and not??
-      // not yet...
     }
   }
 
