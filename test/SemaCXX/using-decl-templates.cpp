@@ -85,10 +85,3 @@ template<typename T> class UsingTypenameNNS {
   using typename T::X;
   typename X::X x;
 };
-
-namespace aliastemplateinst {
-  template<typename T> struct A { };
-  template<typename T> using APtr = A<T*>; // expected-note{{previous use is here}}
-
-  template struct APtr<int>; // expected-error{{elaborated type refers to a non-tag type}}
-}
