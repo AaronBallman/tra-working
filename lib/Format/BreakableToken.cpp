@@ -25,7 +25,7 @@
 namespace clang {
 namespace format {
 
-static const char *const Blanks = " \t\v\f";
+static const char *Blanks = " \t\v\f";
 static bool IsBlank(char C) {
   switch (C) {
     case ' ':
@@ -38,10 +38,10 @@ static bool IsBlank(char C) {
   }
 }
 
-static BreakableToken::Split getCommentSplit(StringRef Text,
-                                             unsigned ContentStartColumn,
-                                             unsigned ColumnLimit,
-                                             encoding::Encoding Encoding) {
+BreakableToken::Split getCommentSplit(StringRef Text,
+                                      unsigned ContentStartColumn,
+                                      unsigned ColumnLimit,
+                                      encoding::Encoding Encoding) {
   if (ColumnLimit <= ContentStartColumn + 1)
     return BreakableToken::Split(StringRef::npos, 0);
 
