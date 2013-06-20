@@ -138,15 +138,16 @@ public:
   const MatcherList &getMatchers() const;
   void setMatchers(const MatcherList &Matchers);
 
-  /// \brief Shortcut functions.
+  /// \brief Specialized Matcher<T> functions.
   template <class T>
   bool hasTypedMatcher() const {
-    return isMatchers() && getMatchers().hasTypedMatcher<T>();
+    return isMatcher() &&
+           ast_matchers::internal::Matcher<T>::canConstructFrom(getMatcher());
   }
 
   template <class T>
   ast_matchers::internal::Matcher<T> getTypedMatcher() const {
-    return getMatchers().getTypedMatcher<T>();
+    return ast_matchers::internal::Matcher<T>::constructFrom(getMatcher());
   }
 
   /// \brief String representation of the type of the value.

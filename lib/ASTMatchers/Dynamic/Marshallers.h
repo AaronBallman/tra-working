@@ -162,7 +162,7 @@ private:
     Error->pushErrorFrame(Args[index].Range, Error->ET_RegistryWrongArgType)   \
         << (index + 1) << ArgTypeTraits<type>::asString()                      \
         << Args[index].Value.getTypeAsString();                                \
-    return MatcherList();                                                      \
+    return NULL;                                                               \
   }
 
 /// \brief Helper methods to extract and merge all possible typed matchers
