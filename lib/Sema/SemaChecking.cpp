@@ -5520,8 +5520,9 @@ class SequenceChecker : public EvaluatedExprVisitor<SequenceChecker> {
 public:
   SequenceChecker(Sema &S, Expr *E,
                   llvm::SmallVectorImpl<Expr*> &WorkList)
-    : Base(S.Context), SemaRef(S), Region(Tree.root()),
-      ModAsSideEffect(0), WorkList(WorkList), EvalTracker(0) {
+    : EvaluatedExprVisitor<SequenceChecker>(S.Context), SemaRef(S),
+      Region(Tree.root()), ModAsSideEffect(0), WorkList(WorkList),
+      EvalTracker(0) {
     Visit(E);
   }
 
@@ -5682,10 +5683,8 @@ public:
   // be chosen.
   void VisitAbstractConditionalOperator(AbstractConditionalOperator *CO) {
     EvaluationTracker Eval(*this);
-    {
-      SequencedSubexpression Sequenced(*this);
-      Visit(CO->getCond());
-    }
+    SequencedSubexpression Sequenced(*this);
+    Visit(CO->getCond());
 
     bool Result;
     if (Eval.evaluate(CO->getCond(), Result))
