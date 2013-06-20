@@ -4784,22 +4784,6 @@ bool Sema::CheckThreadRoleListCommon(const AttributeList &Attr,
   return FoundErrors;
 }
 
-static void handleThreadRoleIncompatibleAttr(Sema &S, Decl *D,
-                                             const AttributeList &Attr) {
-  StringRef SR;
-  if (!S.CheckThreadRoleListCommon(Attr, SR))
-    D->addAttr(::new (S.Context) ThreadRoleIncompatibleAttr(Attr.getRange(),
-                                                            S.Context, SR));
-}
-
-static void handleThreadRoleUniqueAttr(Sema &S, Decl *D,
-                                      const AttributeList &Attr) {
-  StringRef SR;
-  if (!S.CheckThreadRoleListCommon(Attr, SR))
-    D->addAttr(::new (S.Context) ThreadRoleUniqueAttr(Attr.getRange(),
-                                                      S.Context, SR));
-}
-
 enum ThreadRoleSubPartKind {
   TR_Leaf,
   TR_Opt_BinOp_Expr,
@@ -4872,6 +4856,13 @@ static void ProcessInheritableDeclAttr(Sema &S, Scope *scope, Decl *D,
   case AttributeList::AT_Overloadable:
     // Ignore, this is a non-inheritable attribute, handled
     // by ProcessNonInheritableDeclAttr.
+    break;
+  case AttributeList::AT_ThreadRoleGrant:
+  case AttributeList::AT_ThreadRoleRevoke:
+  case AttributeList::AT_ThreadRoleIncompatible:
+  case AttributeList::AT_ThreadRoleUnique:
+    // Ignore, these are statement attributes which should be attached to the
+    // DeclStmt instead of the Decl itself.
     break;
   case AttributeList::AT_Alias:       handleAliasAttr       (S, D, Attr); break;
   case AttributeList::AT_Aligned:     handleAlignedAttr     (S, D, Attr); break;
@@ -5142,12 +5133,6 @@ static void ProcessInheritableDeclAttr(Sema &S, Scope *scope, Decl *D,
     break;
   case AttributeList::AT_ThreadRole:
     handleThreadRoleAttr(S, D, Attr);
-    break;
-  case AttributeList::AT_ThreadRoleUnique:
-    handleThreadRoleUniqueAttr(S, D, Attr);
-    break;
-  case AttributeList::AT_ThreadRoleIncompatible:
-    handleThreadRoleIncompatibleAttr(S, D, Attr);
     break;
 
   // Type safety attributes.

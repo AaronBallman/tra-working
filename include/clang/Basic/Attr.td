@@ -968,11 +968,13 @@ def ThreadRoleRevoke : Attr {
 def ThreadRoleIncompatible : Attr {
   let Spellings = [CXX11<"cert", "thread_role_incompatible">];
   let Args = [StringArgument<"RoleList">];
+  let Subjects = [NullStmt];
 }
 
 def ThreadRoleUnique : Attr {
   let Spellings = [CXX11<"cert", "thread_role_unique">];
-  let Args = [StringArgument<"RoleList">];                   
+  let Args = [StringArgument<"RoleList">];
+  let Subjects = [NullStmt];
 }
 
 
