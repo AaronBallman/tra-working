@@ -31,7 +31,7 @@ void t2()
   c.g(10, version);
 
   void (C::*ptr)(int, ...) = &C::g;
-  (c.*ptr)(10, c); // expected-warning{{cannot pass object of non-POD type 'C' through variadic method; call will abort at runtime}}
+  (c.*ptr)(10, c);  // TODO: This should also warn.
   (c.*ptr)(10, version);
  
   C::h(10, c); // expected-warning{{cannot pass object of non-POD type 'C' through variadic function; call will abort at runtime}}
