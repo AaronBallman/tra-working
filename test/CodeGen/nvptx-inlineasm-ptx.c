@@ -1,5 +1,5 @@
-// RUN: %clang_cc1 -triple nvptx-unknown-unknown -O3 -S -o - %s -emit-llvm | FileCheck %s
-// RUN: %clang_cc1 -triple nvptx64-unknown-unknown -O3 -S -o - %s -emit-llvm | FileCheck %s
+// RUN: %clang_cc1 -triple nvptx-unknown-unknown -O3 -S -o - %s | FileCheck %s
+// RUN: %clang_cc1 -triple nvptx64-unknown-unknown -O3 -S -o - %s | FileCheck %s
 
 void constraints() {
   char           c;
@@ -13,28 +13,28 @@ void constraints() {
   float          f;
   double         d;
 
-  // CHECK: i8 asm sideeffect "mov.b8 $0, $1;", "=c,c"
+  // CHECK: mov.b8 %rc{{[0-9]+}}, %rc{{[0-9]+}}
   asm volatile ("mov.b8 %0, %1;" : "=c"(c) : "c"(c));
-  // CHECK: i8 asm sideeffect "mov.b8 $0, $1;", "=c,c"
+  // CHECK: mov.b8 %rc{{[0-9]+}}, %rc{{[0-9]+}}
   asm volatile ("mov.b8 %0, %1;" : "=c"(uc) : "c"(uc));
 
-  // CHECK: i16 asm sideeffect "mov.b16 $0, $1;", "=h,h"
+  // CHECK: mov.b16 %rs{{[0-9]+}}, %rs{{[0-9]+}}
   asm volatile ("mov.b16 %0, %1;" : "=h"(s) : "h"(s));
-  // CHECK: i16 asm sideeffect "mov.b16 $0, $1;", "=h,h"
+  // CHECK: mov.b16 %rs{{[0-9]+}}, %rs{{[0-9]+}}
   asm volatile ("mov.b16 %0, %1;" : "=h"(us) : "h"(us));
 
-  // CHECK: i32 asm sideeffect "mov.b32 $0, $1;", "=r,r"
+  // CHECK: mov.b32 %r{{[0-9]+}}, %r{{[0-9]+}}
   asm volatile ("mov.b32 %0, %1;" : "=r"(i) : "r"(i));
-  // CHECK: i32 asm sideeffect "mov.b32 $0, $1;", "=r,r"
+  // CHECK: mov.b32 %r{{[0-9]+}}, %r{{[0-9]+}}
   asm volatile ("mov.b32 %0, %1;" : "=r"(ui) : "r"(ui));
 
-  // CHECK: i64 asm sideeffect "mov.b64 $0, $1;", "=l,l"
+  // CHECK: mov.b64 %rl{{[0-9]+}}, %rl{{[0-9]+}}
   asm volatile ("mov.b64 %0, %1;" : "=l"(l) : "l"(l));
-  // CHECK: i64 asm sideeffect "mov.b64 $0, $1;", "=l,l"
+  // CHECK: mov.b64 %rl{{[0-9]+}}, %rl{{[0-9]+}}
   asm volatile ("mov.b64 %0, %1;" : "=l"(ul) : "l"(ul));
 
-  // CHECK: float asm sideeffect "mov.b32 $0, $1;", "=f,f"
+  // CHECK: mov.b32 %f{{[0-9]+}}, %f{{[0-9]+}}
   asm volatile ("mov.b32 %0, %1;" : "=f"(f) : "f"(f));
-  // CHECK: double asm sideeffect "mov.b64 $0, $1;", "=d,d"
+  // CHECK: mov.b64 %fl{{[0-9]+}}, %fl{{[0-9]+}}
   asm volatile ("mov.b64 %0, %1;" : "=d"(d) : "d"(d));
 }
