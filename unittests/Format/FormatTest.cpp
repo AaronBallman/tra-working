@@ -3466,9 +3466,6 @@ TEST_F(FormatTest, BreaksLongDeclarations) {
   verifyFormat("LoooooooooooooooooooooooooooooooooooooooongType\n"
                "    LoooooooooooooooooooooooooooooooooooooooongVariable;",
                getGoogleStyle());
-  verifyFormat("LoooooooooooooooooooooooooooooooooooooooongType const\n"
-               "    LoooooooooooooooooooooooooooooooooooooooongVariable;",
-               getGoogleStyle());
   verifyFormat("LoooooooooooooooooooooooooooooooooooooooongReturnType\n"
                "    LoooooooooooooooooooooooooooooooongFunctionDeclaration();",
                getGoogleStyle());
@@ -4896,7 +4893,7 @@ TEST_F(FormatTest, ConfigurableIndentWidth) {
                EightIndent);
 }
 
-TEST_F(FormatTest, ConfigurableFunctionDeclarationIndentAfterType) {
+TEST_F(FormatTest, ConfigureableFunctionDeclarationIndentAfterType) {
   verifyFormat("void\n"
                "f();",
                getLLVMStyleWithColumns(8));
