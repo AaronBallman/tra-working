@@ -803,10 +803,10 @@ void CommentASTToHTMLConverter::visitFullComment(const FullComment *C) {
   }
 
   if (Parts.Returns.size() != 0) {
-    Result << "<div class=\"result-discussion\">";
+    Result << "<dl>";
     for (unsigned i = 0, e = Parts.Returns.size(); i != e; ++i)
       visit(Parts.Returns[i]);
-    Result << "</div>";
+    Result << "</dl>";
   }
 
   Result.flush();
