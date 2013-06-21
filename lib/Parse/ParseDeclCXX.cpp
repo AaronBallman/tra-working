@@ -1555,7 +1555,6 @@ void Parser::ParseClassSpecifier(tok::TokenKind TagTokKind,
       // recover by ignoring the 'template' keyword.
       Diag(Tok, diag::err_template_defn_explicit_instantiation)
         << 1 << FixItHint::CreateRemoval(TemplateInfo.TemplateLoc);
-      TemplateParams = 0;
     }
 
     bool IsDependent = false;
