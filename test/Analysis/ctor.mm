@@ -501,40 +501,6 @@ namespace ArrayMembers {
   }
 };
 
-namespace VirtualInheritance {
-  int counter;
-
-  struct base {
-    base() {
-      ++counter;
-    }
-  };
-
-  struct virtual_subclass : public virtual base {
-    virtual_subclass() {}
-  };
-
-  struct double_subclass : public virtual_subclass {
-    double_subclass() {}
-  };
-
-  void test() {
-    counter = 0;
-    double_subclass obj;
-    clang_analyzer_eval(counter == 1); // expected-warning{{TRUE}}
-  }
-
-  struct double_virtual_subclass : public virtual virtual_subclass {
-    double_virtual_subclass() {}
-  };
-
-  void testVirtual() {
-    counter = 0;
-    double_virtual_subclass obj;
-    clang_analyzer_eval(counter == 1); // expected-warning{{TRUE}}
-  }
-}
-
 namespace ZeroInitialization {
   struct raw_pair {
     int p1;
@@ -608,20 +574,4 @@ namespace ZeroInitialization {
     clang_analyzer_eval(p.p1 == 0); // expected-warning{{TRUE}}
     clang_analyzer_eval(p.p2 == 0); // expected-warning{{TRUE}}
   }
-
-  struct pair_wrapper {
-    pair_wrapper() : p() {}
-    raw_pair p;
-  };
-
-  struct virtual_subclass : public virtual pair_wrapper {
-    virtual_subclass() {}
-  };
-
-  struct double_virtual_subclass : public virtual_subclass {
-    double_virtual_subclass() {
-      // This previously caused a crash because the pair_wrapper subobject was
-      // initialized twice.
-    }
-  };
 }
