@@ -1962,7 +1962,7 @@ llvm::DIType CGDebugInfo::getOrCreateType(QualType Ty, llvm::DIFile Unit,
 
   llvm::DIType T = getCompletedTypeOrNull(Ty);
 
-  if (T.isType()) {
+  if (T.Verify()) {
     // If we're looking for a definition, make sure we have definitions of any
     // underlying types.
     if (const TypedefType* TTy = dyn_cast<TypedefType>(Ty))
