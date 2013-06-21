@@ -52,6 +52,7 @@ public:
   virtual ast_type_traits::ASTNodeKind getSupportedKind() const {
     return ast_type_traits::ASTNodeKind();
   }
+
 private:
   uint64_t ID;
   std::string BoundID;
@@ -179,11 +180,14 @@ using ast_matchers::internal::Matcher;
 
 TEST(ParserTest, FullParserTest) {
   OwningPtr<DynTypedMatcher> VarDecl(Parser::parseMatcherExpression(
-      "varDecl(hasInitializer(binaryOperator(hasLHS(integerLiteral()))))",
+      "varDecl(hasInitializer(binaryOperator(hasLHS(integerLiteral()),"
+      "                                      hasOperatorName(\"+\"))))",
       NULL));
   Matcher<Decl> M = Matcher<Decl>::constructFrom(*VarDecl);
   EXPECT_TRUE(matches("int x = 1 + false;", M));
   EXPECT_FALSE(matches("int x = true + 1;", M));
+  EXPECT_FALSE(matches("int x = 1 - false;", M));
+  EXPECT_FALSE(matches("int x = true - 1;", M));
 
   OwningPtr<DynTypedMatcher> HasParameter(Parser::parseMatcherExpression(
       "functionDecl(hasParameter(1, hasName(\"x\")))", NULL));

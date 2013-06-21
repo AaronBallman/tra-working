@@ -2314,18 +2314,15 @@ struct NotEqualsBoundNodePredicate {
 ///     forEachDescendant(declRefExpr(to(decl(equalsBoundNode("d"))))))
 /// will trigger a match for each combination of variable declaration
 /// and reference to that variable declaration within a compound statement.
-AST_POLYMORPHIC_MATCHER_P(equalsBoundNode, std::string, ID) {
+AST_POLYMORPHIC_MATCHER_P(equalsBoundNode, AST_POLYMORPHIC_SUPPORTED_TYPES_4(
+                                               Stmt, Decl, Type, QualType),
+                          std::string, ID) {
   // FIXME: Figure out whether it makes sense to allow this
   // on any other node types.
   // For *Loc it probably does not make sense, as those seem
   // unique. For NestedNameSepcifier it might make sense, as
   // those also have pointer identity, but I'm not sure whether
   // they're ever reused.
-  TOOLING_COMPILE_ASSERT((llvm::is_base_of<Stmt, NodeType>::value ||
-                          llvm::is_base_of<Decl, NodeType>::value ||
-                          llvm::is_base_of<Type, NodeType>::value ||
-                          llvm::is_base_of<QualType, NodeType>::value),
-                         equals_bound_node_requires_non_unique_node_class);
   internal::NotEqualsBoundNodePredicate Predicate;
   Predicate.ID = ID;
   Predicate.Node = ast_type_traits::DynTypedNode::create(Node);

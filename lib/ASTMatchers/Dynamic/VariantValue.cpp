@@ -175,18 +175,6 @@ std::string VariantValue::getTypeAsString() const {
   llvm_unreachable("Invalid Type");
 }
 
-std::string VariantValue::getTypeAsString() const {
-  switch (Type) {
-  case VT_String: return "String";
-  case VT_Matcher:
-    return (Twine("Matcher<") + getMatcher().getSupportedKind().asStringRef() +
-            ">").str();
-  case VT_Unsigned: return "Unsigned";
-  case VT_Nothing: return "Nothing";
-  }
-  llvm_unreachable("Invalid Type");
-}
-
 } // end namespace dynamic
 } // end namespace ast_matchers
 } // end namespace clang
