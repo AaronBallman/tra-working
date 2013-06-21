@@ -1914,10 +1914,11 @@ void CGDebugInfo::completeFwdDecl(const RecordDecl &RD) {
   if (DebugKind <= CodeGenOptions::LimitedDebugInfo)
     return;
 
-  llvm::DIType T = getTypeOrNull(CGM.getContext().getRecordType(&RD));
+  QualType QTy = CGM.getContext().getRecordType(&RD);
+  llvm::DIType T = getTypeOrNull(QTy);
 
   if (T.Verify() && T.isForwardDecl())
-    getOrCreateType(QTy, getOrCreateFile(RD.getLocation());
+    getOrCreateType(QTy, getOrCreateFile(RD.getLocation()));
 }
 
 void CGDebugInfo::completeFwdDecl(const RecordDecl &RD) {
