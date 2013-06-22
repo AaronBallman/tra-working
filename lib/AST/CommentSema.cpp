@@ -622,11 +622,6 @@ void Sema::checkBlockCommandDuplicate(const BlockCommandComment *Command) {
       return;
     }
     PrevCommand = BriefCommand;
-  } else if (Info->IsReturnsCommand) {
-    if (!ReturnsCommand)
-      ReturnsCommand = Command;
-    PrevCommand = ReturnsCommand;
-    return;
   } else if (Info->IsHeaderfileCommand) {
     if (!HeaderfileCommand) {
       HeaderfileCommand = Command;

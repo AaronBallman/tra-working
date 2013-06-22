@@ -28,12 +28,12 @@
   </Parameter>
 </Parameters>
 <ResultDiscussion>
-  <Para>Fff.</Para>
-  <Para>Ggg</Para>
+  <Para>Eee.</Para>
+  <Para>Fff</Para>
 </ResultDiscussion>
 <Discussion>
-  <Para>Hhh</Para>
-  <Verbatim xml:space="preserve" kind="verbatim">Iii</Verbatim>
+  <Para>Ggg</Para>
+  <Verbatim xml:space="preserve" kind="verbatim">Hhh</Verbatim>
 </Discussion>
 </Function>
 
