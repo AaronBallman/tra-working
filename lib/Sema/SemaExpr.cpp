@@ -4471,6 +4471,9 @@ Sema::BuildResolvedCallExpr(Expr *Fn, NamedDecl *NDecl,
   } else if (NDecl) {
     if (CheckPointerCall(NDecl, TheCall, Proto))
       return ExprError();
+  } else {
+    if (CheckOtherCall(TheCall, Proto))
+      return ExprError();
   }
 
   return MaybeBindToTemporary(TheCall);
