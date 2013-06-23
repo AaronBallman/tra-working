@@ -6273,6 +6273,8 @@ void gnutools::Link::ConstructJob(Compilation &C, const JobAction &JA,
     }
   }
 
+  addProfileRTLinux(getToolChain(), Args, CmdArgs);
+
   C.addCommand(new Command(JA, *this, ToolChain.Linker.c_str(), CmdArgs));
 }
 
