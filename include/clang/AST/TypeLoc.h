@@ -978,7 +978,7 @@ inline TypeLoc TypeLoc::IgnoreParens() const {
 struct DecayedLocInfo { }; // Nothing.
 
 /// \brief Wrapper for source info for pointers decayed from arrays and
-/// functions.
+/// funcitons.
 class DecayedTypeLoc : public ConcreteTypeLoc<UnqualTypeLoc, DecayedTypeLoc,
                                               DecayedType, DecayedLocInfo> {
 public:
