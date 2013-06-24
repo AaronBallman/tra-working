@@ -1468,7 +1468,16 @@ void CXXNameMangler::manglePrefix(const DeclContext *DC, bool NoFunction) {
   if (DC->isTranslationUnit())
     return;
 
-  if (NoFunction && isLocalContainerContext(DC))
+  if (const BlockDecl *Block = dyn_cast<BlockDecl>(DC)) {
+    // The symbol we're adding a prefix for isn't externally
+    // visible; make up something sane.
+    // FIXME: This isn't always true!
+    SmallString<16> BlockPrefix;
+    BlockPrefix += "__block_prefix_internal";
+    unsigned Number = Context.getBlockId(Block, false);
+    if (Number > 1)
+      BlockPrefix += llvm::utostr_32(Number - 2);
+    Out << BlockPrefix.size() << BlockPrefix;
     return;
 
   assert(!isLocalContainerContext(DC));
