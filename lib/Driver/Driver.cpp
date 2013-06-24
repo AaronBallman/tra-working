@@ -1534,15 +1534,15 @@ std::string Driver::GetFilePath(const char *Name, const ToolChain &TC) const {
       continue;
     if (Dir[0] == '=')
       Dir = SysRoot + Dir.substr(1);
-    SmallString<128> P(Dir);
-    llvm::sys::path::append(P, Name);
-    if (llvm::sys::fs::exists(Twine(P)))
+    llvm::sys::Path P(Dir);
+    P.appendComponent(Name);
+    if (llvm::sys::fs::exists(P.str()))
       return P.str();
   }
 
-  SmallString<128> P(ResourceDir);
-  llvm::sys::path::append(P, Name);
-  if (llvm::sys::fs::exists(Twine(P)))
+  llvm::sys::Path P(ResourceDir);
+  P.appendComponent(Name);
+  if (llvm::sys::fs::exists(P.str()))
     return P.str();
 
   const ToolChain::path_list &List = TC.getFilePaths();
@@ -1553,9 +1553,9 @@ std::string Driver::GetFilePath(const char *Name, const ToolChain &TC) const {
       continue;
     if (Dir[0] == '=')
       Dir = SysRoot + Dir.substr(1);
-    SmallString<128> P(Dir);
-    llvm::sys::path::append(P, Name);
-    if (llvm::sys::fs::exists(Twine(P)))
+    llvm::sys::Path P(Dir);
+    P.appendComponent(Name);
+    if (llvm::sys::fs::exists(P.str()))
       return P.str();
   }
 
