@@ -1900,10 +1900,11 @@ static bool isSameEntity(NamedDecl *X, NamedDecl *Y) {
   // Identical template names and kinds match if their template parameter lists
   // and patterns match.
   if (TemplateDecl *TemplateX = dyn_cast<TemplateDecl>(X)) {
-    TemplateDecl *TemplateY = dyn_cast<TemplateDecl>(Y);
-    // FIXME: Check template parameter lists.
+    TemplateDecl *TemplateY = cast<TemplateDecl>(Y);
     return isSameEntity(TemplateX->getTemplatedDecl(),
-                        TemplateY->getTemplatedDecl());
+                        TemplateY->getTemplatedDecl()) &&
+           isSameTemplateParameterList(TemplateX->getTemplateParameters(),
+                                       TemplateY->getTemplateParameters());
   }
 
   // FIXME: Many other cases to implement.
