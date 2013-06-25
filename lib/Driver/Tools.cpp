@@ -31,7 +31,6 @@
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Format.h"
 #include "llvm/Support/Host.h"
-#include "llvm/Support/PathV1.h"
 #include "llvm/Support/Program.h"
 #include "llvm/Support/Process.h"
 #include "llvm/Support/raw_ostream.h"
@@ -345,21 +344,24 @@ void Clang::AddPreprocessingOptions(Compilation &C,
 
       bool FoundPTH = false;
       bool FoundPCH = false;
-      llvm::sys::Path P(A->getValue());
+      SmallString<128> P(A->getValue());
+      // We want the files to have a name like foo.h.pch. Add a dummy extension
+      // so that replace_extension does the right thing.
+      P += ".dummy";
       if (UsePCH) {
-        P.appendSuffix("pch");
+        llvm::sys::path::replace_extension(P, "pch");
         if (llvm::sys::fs::exists(P.str()))
           FoundPCH = true;
       }
 
       if (!FoundPCH) {
-        P.appendSuffix("pth");
+        llvm::sys::path::replace_extension(P, "pth");
         if (llvm::sys::fs::exists(P.str()))
           FoundPTH = true;
       }
 
       if (!FoundPCH && !FoundPTH) {
-        P.appendSuffix("gch");
+        llvm::sys::path::replace_extension(P, "gch");
         if (llvm::sys::fs::exists(P.str())) {
           FoundPCH = UsePCH;
           FoundPTH = !UsePCH;
