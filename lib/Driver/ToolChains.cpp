@@ -534,12 +534,14 @@ void DarwinClang::AddCXXStdlibLibArgs(const ArgList &Args,
 
     // Check in the sysroot first.
     if (const Arg *A = Args.getLastArg(options::OPT_isysroot)) {
-      SmallString<128> P(A->getValue());
-      llvm::sys::path::append(P, "usr", "lib", "libstdc++.dylib");
+      llvm::sys::Path P(A->getValue());
+      P.appendComponent("usr");
+      P.appendComponent("lib");
+      P.appendComponent("libstdc++.dylib");
 
       if (!llvm::sys::fs::exists(P.str())) {
-        llvm::sys::path::remove_filename(P);
-        llvm::sys::path::append(P, "libstdc++.6.dylib");
+        P.eraseComponent();
+        P.appendComponent("libstdc++.6.dylib");
         if (llvm::sys::fs::exists(P.str())) {
           CmdArgs.push_back(Args.MakeArgString(P.str()));
           return;
