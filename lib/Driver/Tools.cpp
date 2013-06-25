@@ -345,24 +345,21 @@ void Clang::AddPreprocessingOptions(Compilation &C,
 
       bool FoundPTH = false;
       bool FoundPCH = false;
-      SmallString<128> P(A->getValue());
-      // We want the files to have a name like foo.h.pch. Add a dummy extension
-      // so that replace_extension does the right thing.
-      P += ".dummy";
+      llvm::sys::Path P(A->getValue());
       if (UsePCH) {
-        llvm::sys::path::replace_extension(P, "pch");
+        P.appendSuffix("pch");
         if (llvm::sys::fs::exists(P.str()))
           FoundPCH = true;
       }
 
       if (!FoundPCH) {
-        llvm::sys::path::replace_extension(P, "pth");
+        P.appendSuffix("pth");
         if (llvm::sys::fs::exists(P.str()))
           FoundPTH = true;
       }
 
       if (!FoundPCH && !FoundPTH) {
-        llvm::sys::path::replace_extension(P, "gch");
+        P.appendSuffix("gch");
         if (llvm::sys::fs::exists(P.str())) {
           FoundPCH = UsePCH;
           FoundPTH = !UsePCH;
