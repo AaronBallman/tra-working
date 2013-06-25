@@ -501,77 +501,36 @@ namespace ArrayMembers {
   }
 };
 
-namespace ZeroInitialization {
-  struct raw_pair {
-    int p1;
-    int p2;
+namespace VirtualInheritance {
+  int counter;
+
+  struct base {
+    base() {
+      ++counter;
+    }
   };
 
-  void testVarDecl() {
-    raw_pair p{};
-    clang_analyzer_eval(p.p1 == 0); // expected-warning{{TRUE}}
-    clang_analyzer_eval(p.p2 == 0); // expected-warning{{TRUE}}
-  }
-
-  void testTemporary() {
-    clang_analyzer_eval(raw_pair().p1 == 0); // expected-warning{{TRUE}}
-    clang_analyzer_eval(raw_pair().p2 == 0); // expected-warning{{TRUE}}
-  }
-
-  void testArray() {
-    raw_pair p[2] = {};
-    clang_analyzer_eval(p[0].p1 == 0); // expected-warning{{TRUE}}
-    clang_analyzer_eval(p[0].p2 == 0); // expected-warning{{TRUE}}
-    clang_analyzer_eval(p[1].p1 == 0); // expected-warning{{TRUE}}
-    clang_analyzer_eval(p[1].p2 == 0); // expected-warning{{TRUE}}
-  }
-
-  void testNew() {
-    // FIXME: Pending proper implementation of constructors for 'new'.
-    raw_pair *pp = new raw_pair();
-    clang_analyzer_eval(pp->p1 == 0); // expected-warning{{UNKNOWN}}
-    clang_analyzer_eval(pp->p2 == 0); // expected-warning{{UNKNOWN}}
-  }
-
-  void testArrayNew() {
-    // FIXME: Pending proper implementation of constructors for 'new[]'.
-    raw_pair *p = new raw_pair[2]();
-    clang_analyzer_eval(p[0].p1 == 0); // expected-warning{{UNKNOWN}}
-    clang_analyzer_eval(p[0].p2 == 0); // expected-warning{{UNKNOWN}}
-    clang_analyzer_eval(p[1].p1 == 0); // expected-warning{{UNKNOWN}}
-    clang_analyzer_eval(p[1].p2 == 0); // expected-warning{{UNKNOWN}}
-  }
-
-  struct initializing_pair {
-  public:
-    int x;
-    raw_pair y;
-    initializing_pair() : x(), y() {}
-  };
-  
-  void testFieldInitializers() {
-    initializing_pair p;
-    clang_analyzer_eval(p.x == 0); // expected-warning{{TRUE}}
-    clang_analyzer_eval(p.y.p1 == 0); // expected-warning{{TRUE}}
-    clang_analyzer_eval(p.y.p2 == 0); // expected-warning{{TRUE}}
-  }
-
-  struct subclass : public raw_pair {
-    subclass() = default;
+  struct virtual_subclass : public virtual base {
+    virtual_subclass() {}
   };
 
-  void testSubclass() {
-    subclass p;
-    clang_analyzer_eval(p.p1 == 0); // expected-warning{{garbage}}
-  }
-
-  struct initializing_subclass : public raw_pair {
-    initializing_subclass() : raw_pair() {}
+  struct double_subclass : public virtual_subclass {
+    double_subclass() {}
   };
 
-  void testInitializingSubclass() {
-    initializing_subclass p;
-    clang_analyzer_eval(p.p1 == 0); // expected-warning{{TRUE}}
-    clang_analyzer_eval(p.p2 == 0); // expected-warning{{TRUE}}
+  void test() {
+    counter = 0;
+    double_subclass obj;
+    clang_analyzer_eval(counter == 1); // expected-warning{{TRUE}}
+  }
+
+  struct double_virtual_subclass : public virtual virtual_subclass {
+    double_virtual_subclass() {}
+  };
+
+  void testVirtual() {
+    counter = 0;
+    double_virtual_subclass obj;
+    clang_analyzer_eval(counter == 1); // expected-warning{{TRUE}}
   }
 }
