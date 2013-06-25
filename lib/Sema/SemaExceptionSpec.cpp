@@ -209,18 +209,33 @@ bool Sema::CheckEquivalentExceptionSpec(FunctionDecl *Old, FunctionDecl *New) {
     return false;
   }
 
-  const FunctionProtoType *OldProto =
-    Old->getType()->castAs<FunctionProtoType>();
+  if (MissingExceptionSpecification && NewProto) {
+    const FunctionProtoType *OldProto =
+      Old->getType()->getAs<FunctionProtoType>();
 
-  FunctionProtoType::ExtProtoInfo EPI = NewProto->getExtProtoInfo();
-  EPI.ExceptionSpecType = OldProto->getExceptionSpecType();
-  if (EPI.ExceptionSpecType == EST_Dynamic) {
-    EPI.NumExceptions = OldProto->getNumExceptions();
-    EPI.Exceptions = OldProto->exception_begin();
-  } else if (EPI.ExceptionSpecType == EST_ComputedNoexcept) {
-    // FIXME: We can't just take the expression from the old prototype. It
-    // likely contains references to the old prototype's parameters.
-  }
+    FunctionProtoType::ExtProtoInfo EPI = NewProto->getExtProtoInfo();
+    EPI.ExceptionSpecType = OldProto->getExceptionSpecType();
+    if (EPI.ExceptionSpecType == EST_Dynamic) {
+      EPI.NumExceptions = OldProto->getNumExceptions();
+      EPI.Exceptions = OldProto->exception_begin();
+    } else if (EPI.ExceptionSpecType == EST_ComputedNoexcept) {
+      // FIXME: We can't just take the expression from the old prototype. It
+      // likely contains references to the old prototype's parameters.
+    }
+
+    // Update the type of the function with the appropriate exception
+    // specification.
+    QualType NewType = Context.getFunctionType(NewProto->getResultType(),
+                                               NewProto->getArgTypes(), EPI);
+    New->setType(NewType);
+
+    // Warn about the lack of exception specification.
+    SmallString<128> ExceptionSpecString;
+    llvm::raw_svector_ostream OS(ExceptionSpecString);
+    switch (OldProto->getExceptionSpecType()) {
+    case EST_DynamicNone:
+      OS << "throw()";
+      break;
 
   // Update the type of the function with the appropriate exception
   // specification.
