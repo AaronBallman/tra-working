@@ -845,7 +845,7 @@ static InputKind ParseFrontendArgs(FrontendOptions &Opts, ArgList &Args,
 
 std::string CompilerInvocation::GetResourcesPath(const char *Argv0,
                                                  void *MainAddr) {
-  SmallString<128> P(llvm::sys::fs::getMainExecutable(Argv0, MainAddr));
+  llvm::sys::Path P(llvm::sys::fs::getMainExecutable(Argv0, MainAddr));
 
   if (!P.empty()) {
     llvm::sys::path::remove_filename(P); // Remove /clang from foo/bin/clang
