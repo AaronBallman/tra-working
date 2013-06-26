@@ -1730,16 +1730,9 @@ void RecordLayoutBuilder::Layout(const ObjCInterfaceDecl *D) {
 void RecordLayoutBuilder::LayoutFields(const RecordDecl *D) {
   // Layout each field, for now, just sequentially, respecting alignment.  In
   // the future, this will need to be tweakable by targets.
-  ZeroLengthBitfield = 0;
   for (RecordDecl::field_iterator Field = D->field_begin(),
-       FieldEnd = D->field_end(); Field != FieldEnd; ++Field) {
-    if (!Context.getTargetInfo().useBitFieldTypeAlignment() &&
-        Context.getTargetInfo().useZeroLengthBitfieldAlignment()) {
-      if (Field->isBitField() && Field->getBitWidthValue(Context) == 0)
-        ZeroLengthBitfield = *Field;
-    }
+       FieldEnd = D->field_end(); Field != FieldEnd; ++Field)
     LayoutField(*Field);
-  }
 }
 
 void RecordLayoutBuilder::LayoutWideBitField(uint64_t FieldSize,
@@ -1833,10 +1826,14 @@ void RecordLayoutBuilder::LayoutBitField(const FieldDecl *D) {
   uint64_t UnpaddedFieldOffset = getDataSizeInBits() - UnfilledBitsInLastUnit;
   uint64_t FieldOffset = IsUnion ? 0 : UnpaddedFieldOffset;
 
-  if (ZeroLengthBitfield) {
+  bool ZeroLengthBitfield = false;
+  if (!Context.getTargetInfo().useBitFieldTypeAlignment() &&
+      Context.getTargetInfo().useZeroLengthBitfieldAlignment() &&
+      FieldSize == 0) {
     // The alignment of a zero-length bitfield affects the alignment
     // of the next member.  The alignment is the max of the zero 
     // length bitfield's alignment and a target specific fixed value.
+    ZeroLengthBitfield = true;
     unsigned ZeroLengthBitfieldBoundary =
       Context.getTargetInfo().getZeroLengthBitfieldBoundary();
     if (ZeroLengthBitfieldBoundary > FieldAlign)
@@ -1910,8 +1907,6 @@ void RecordLayoutBuilder::LayoutBitField(const FieldDecl *D) {
       !Context.getTargetInfo().useZeroLengthBitfieldAlignment() &&
       !IsMsStruct)
     FieldAlign = UnpackedFieldAlign = 1;
-
-  ZeroLengthBitfield = 0;
 
   if (ExternalLayout)
     FieldOffset = updateExternalFieldOffset(D, FieldOffset);
