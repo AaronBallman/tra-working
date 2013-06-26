@@ -25,9 +25,6 @@ void test() {
   f(a = 0, a); // expected-warning {{unsequenced modification and access}}
   f(a, a += 0); // expected-warning {{unsequenced modification and access}}
   f(a = 0, a = 0); // expected-warning {{multiple unsequenced modifications}}
-  a = f(++a, 0); // ok
-  a = f(a++, 0); // ok
-  a = f(++a, a++); // expected-warning {{multiple unsequenced modifications}}
 
   a = ++a; // expected-warning {{multiple unsequenced modifications}}
   a += ++a; // expected-warning {{unsequenced modification and access}}

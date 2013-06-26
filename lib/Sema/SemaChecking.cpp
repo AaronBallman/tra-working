@@ -5683,8 +5683,10 @@ public:
   // be chosen.
   void VisitAbstractConditionalOperator(AbstractConditionalOperator *CO) {
     EvaluationTracker Eval(*this);
-    SequencedSubexpression Sequenced(*this);
-    Visit(CO->getCond());
+    {
+      SequencedSubexpression Sequenced(*this);
+      Visit(CO->getCond());
+    }
 
     bool Result;
     if (Eval.evaluate(CO->getCond(), Result))
