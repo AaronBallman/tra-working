@@ -38,3 +38,17 @@ namespace PR16292 {
   template<class T> class DerivedClass : public BaseClass {};
   void* p = new DerivedClass<void>;
 }
+
+namespace rdar14183893 {
+  class Typ { // expected-note {{not complete}}
+    Typ x; // expected-error {{incomplete type}}
+  };
+
+  template <unsigned  C> class B :  Typ {};
+  typedef B<0> TFP;
+
+  class A {
+    TFP m_p;
+    void Enable() { 0, A(); } // expected-warning {{unused}}
+  };
+}
