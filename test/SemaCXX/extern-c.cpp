@@ -3,11 +3,11 @@
 namespace test1 {
   extern "C" {
     void test1_f() {
-      void test1_g(int);
+      void test1_g(int); // expected-note {{declared with C language linkage here}}
     }
   }
 }
-int test1_g(int);
+int test1_g(int); // expected-error {{declaration of 'test1_g' in global scope conflicts with declaration with C language linkage}}
 
 namespace test2 {
   extern "C" {
@@ -98,7 +98,7 @@ namespace linkage {
   }
 }
 
-int lookup_in_global_f; // expected-note {{here}}
+void lookup_in_global_f(); // expected-note {{here}}
 namespace lookup_in_global {
   void lookup_in_global_f();
   void lookup_in_global_g();
@@ -107,7 +107,7 @@ namespace lookup_in_global {
     void lookup_in_global_g(int); // expected-note {{here}}
   }
 }
-int lookup_in_global_g; // expected-error {{conflicts with declaration with C language linkage}}
+void lookup_in_global_g(); // expected-error {{conflicts with declaration with C language linkage}}
 
 namespace N1 {
   extern "C" int different_kind_1; // expected-note {{here}}
@@ -118,7 +118,6 @@ namespace N2 {
   extern "C" int different_kind_2; // expected-error {{different kind of symbol}}
 }
 
-// We allow all these even though the standard says they are ill-formed.
 extern "C" {
   struct stat {};
   void stat(struct stat);
@@ -128,19 +127,7 @@ namespace X {
     void stat(struct ::stat);
   }
 }
-int stat(int *p);
-void global_fn_vs_extern_c_var_1();
-namespace X {
-  extern "C" int global_fn_vs_extern_c_var_1;
-  extern "C" int global_fn_vs_extern_c_var_2;
-}
-void global_fn_vs_extern_c_var_2();
-void global_fn_vs_extern_c_fn_1();
-namespace X {
-  extern "C" int global_fn_vs_extern_c_fn_1(int);
-  extern "C" int global_fn_vs_extern_c_fn_2(int);
-}
-void global_fn_vs_extern_c_fn_2();
+
 extern "C" void name_with_using_decl_1(int);
 namespace using_decl {
   void name_with_using_decl_1();
@@ -152,18 +139,3 @@ using using_decl::name_with_using_decl_2;
 extern "C" void name_with_using_decl_2(int);
 extern "C" void name_with_using_decl_3(int);
 using using_decl::name_with_using_decl_3;
-
-// We do not allow a global variable and an extern "C" function to have the same
-// name, because such entities may have the same mangled name.
-int global_var_vs_extern_c_fn_1; // expected-note {{here}}
-namespace X {
-  extern "C" void global_var_vs_extern_c_fn_1(); // expected-error {{conflicts with declaration in global scope}}
-  extern "C" void global_var_vs_extern_c_fn_2(); // expected-note {{here}}
-}
-int global_var_vs_extern_c_fn_2; // expected-error {{conflicts with declaration with C language linkage}}
-int global_var_vs_extern_c_var_1; // expected-note {{here}}
-namespace X {
-  extern "C" double global_var_vs_extern_c_var_1; // expected-error {{conflicts with declaration in global scope}}
-  extern "C" double global_var_vs_extern_c_var_2; // expected-note {{here}}
-}
-int global_var_vs_extern_c_var_2; // expected-error {{conflicts with declaration with C language linkage}}

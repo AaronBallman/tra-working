@@ -42,14 +42,14 @@ using namespace pr5430;
 extern "C" void pr5430::func(void) { }
 
 // PR5405
-int f2(char *)
+int f2(char *) // expected-note {{here}}
 {
         return 0;
 }
 
 extern "C"
 {
-    int f2(int)
+    int f2(int) // expected-error {{with C language linkage conflicts with declaration in global scope}}
     {
         return f2((char *)0);
     }
