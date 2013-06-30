@@ -25,7 +25,7 @@
 namespace clang {
 namespace format {
 
-static const char *Blanks = " \t\v\f";
+static const char *const Blanks = " \t\v\f";
 static bool IsBlank(char C) {
   switch (C) {
     case ' ':
