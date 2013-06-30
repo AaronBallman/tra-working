@@ -5520,9 +5520,8 @@ class SequenceChecker : public EvaluatedExprVisitor<SequenceChecker> {
 public:
   SequenceChecker(Sema &S, Expr *E,
                   llvm::SmallVectorImpl<Expr*> &WorkList)
-    : EvaluatedExprVisitor<SequenceChecker>(S.Context), SemaRef(S),
-      Region(Tree.root()), ModAsSideEffect(0), WorkList(WorkList),
-      EvalTracker(0) {
+    : Base(S.Context), SemaRef(S), Region(Tree.root()),
+      ModAsSideEffect(0), WorkList(WorkList), EvalTracker(0) {
     Visit(E);
   }
 
