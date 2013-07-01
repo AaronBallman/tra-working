@@ -38,10 +38,10 @@ static bool IsBlank(char C) {
   }
 }
 
-BreakableToken::Split getCommentSplit(StringRef Text,
-                                      unsigned ContentStartColumn,
-                                      unsigned ColumnLimit,
-                                      encoding::Encoding Encoding) {
+static BreakableToken::Split getCommentSplit(StringRef Text,
+                                             unsigned ContentStartColumn,
+                                             unsigned ColumnLimit,
+                                             encoding::Encoding Encoding) {
   if (ColumnLimit <= ContentStartColumn + 1)
     return BreakableToken::Split(StringRef::npos, 0);
 
