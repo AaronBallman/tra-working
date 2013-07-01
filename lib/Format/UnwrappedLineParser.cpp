@@ -257,8 +257,10 @@ void UnwrappedLineParser::calculateBraceTypes() {
   do {
     // Get next none-comment token.
     FormatToken *NextTok;
+    unsigned ReadTokens = 0;
     do {
       NextTok = Tokens->getNextToken();
+      ++ReadTokens;
     } while (NextTok->is(tok::comment));
 
     switch (Tok->Tok.getKind()) {
