@@ -67,15 +67,11 @@ static const DeclContext *getEffectiveDeclContext(const Decl *D) {
 static const DeclContext *getEffectiveParentContext(const DeclContext *DC) {
   return getEffectiveDeclContext(cast<Decl>(DC));
 }
-
-static bool isLocalContainerContext(const DeclContext *DC) {
-  return isa<FunctionDecl>(DC) || isa<ObjCMethodDecl>(DC) || isa<BlockDecl>(DC);
-}
-
+  
 static const CXXRecordDecl *GetLocalClassDecl(const Decl *D) {
   const DeclContext *DC = getEffectiveDeclContext(D);
   while (!DC->isNamespace() && !DC->isTranslationUnit()) {
-    if (isLocalContainerContext(DC))
+    if (isa<FunctionDecl>(DC) || isa<ObjCMethodDecl>(DC) || isa<BlockDecl>(DC))
       return dyn_cast<CXXRecordDecl>(D);
     D = cast<Decl>(DC);
     DC = getEffectiveDeclContext(D);
@@ -1280,14 +1276,15 @@ void CXXNameMangler::mangleLocalName(const Decl *D) {
   // <local-name> := Z <function encoding> E d [ <parameter number> ] 
   //                 _ <entity name>
   // <discriminator> := _ <non-negative number>
-  const DeclContext *DC = getEffectiveDeclContext(ND);
+  const CXXRecordDecl *RD = GetLocalClassDecl(ND);
+  const DeclContext *DC = getEffectiveDeclContext(RD ? RD : ND);
 
   Out << 'Z';
 
   if (const ObjCMethodDecl *MD = dyn_cast<ObjCMethodDecl>(DC))
     mangleObjCMethodName(MD);
   else if (const BlockDecl *BD = dyn_cast<BlockDecl>(DC))
-    mangleBlockForPrefix(BD);
+    manglePrefix(BD); // FIXME: This isn't right.
   else
     mangleFunctionEncoding(cast<FunctionDecl>(DC));
 
@@ -1316,16 +1313,10 @@ void CXXNameMangler::mangleLocalName(const Decl *D) {
     }
     
     // Mangle the name relative to the closest enclosing function.
-    // equality ok because RD derived from ND above
-    if (D == RD)  {
-      mangleUnqualifiedName(RD);
-    } else if (const BlockDecl *BD = dyn_cast<BlockDecl>(D)) {
-      manglePrefix(getEffectiveDeclContext(BD), true /*NoFunction*/);
-      mangleUnqualifiedBlock(BD);
-    } else {
-      const NamedDecl *ND = cast<NamedDecl>(D);
+    if (ND == RD) // equality ok because RD derived from ND above
+      mangleUnqualifiedName(ND);
+    else
       mangleNestedName(ND, getEffectiveDeclContext(ND), true /*NoFunction*/);
-    }
 
     if (!SkipDiscriminator) {
       unsigned disc;
@@ -1340,48 +1331,7 @@ void CXXNameMangler::mangleLocalName(const Decl *D) {
     return;
   }
 
-  if (const BlockDecl *BD = dyn_cast<BlockDecl>(D))
-    mangleUnqualifiedBlock(BD);
-  else
-    mangleUnqualifiedName(cast<NamedDecl>(D));
-}
-
-void CXXNameMangler::mangleBlockForPrefix(const BlockDecl *Block) {
-  if (GetLocalClassDecl(Block)) {
-    mangleLocalName(Block);
-    return;
-  }
-  const DeclContext *DC = getEffectiveDeclContext(Block);
-  if (isLocalContainerContext(DC)) {
-    mangleLocalName(Block);
-    return;
-  }
-  manglePrefix(getEffectiveDeclContext(Block));
-  mangleUnqualifiedBlock(Block);
-}
-
-void CXXNameMangler::mangleUnqualifiedBlock(const BlockDecl *Block) {
-  if (Decl *Context = Block->getBlockManglingContextDecl()) {
-    if ((isa<VarDecl>(Context) || isa<FieldDecl>(Context)) &&
-        Context->getDeclContext()->isRecord()) {
-      if (const IdentifierInfo *Name
-            = cast<NamedDecl>(Context)->getIdentifier()) {
-        mangleSourceName(Name);
-        Out << 'M';            
-      }
-    }
-  }
-
-  // If we have a block mangling number, use it.
-  unsigned Number = Block->getBlockManglingNumber();
-  // Otherwise, just make up a number. It doesn't matter what it is because
-  // the symbol in question isn't externally visible.
-  if (!Number)
-    Number = Context.getBlockId(Block, false);
-  Out << "Ub";
-  if (Number > 1)
-    Out << Number - 2;
-  Out << '_';
+  mangleUnqualifiedName(ND);
 }
 
 void CXXNameMangler::mangleLambda(const CXXRecordDecl *Lambda) {
