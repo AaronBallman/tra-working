@@ -1917,7 +1917,7 @@ void CGDebugInfo::completeFwdDecl(const RecordDecl &RD) {
   QualType QTy = CGM.getContext().getRecordType(&RD);
   llvm::DIType T = getTypeOrNull(QTy);
 
-  if (T.Verify() && T.isForwardDecl())
+  if (T.isType() && T.isForwardDecl())
     getOrCreateType(QTy, getOrCreateFile(RD.getLocation()));
 }
 
@@ -1962,7 +1962,7 @@ llvm::DIType CGDebugInfo::getOrCreateType(QualType Ty, llvm::DIFile Unit,
 
   llvm::DIType T = getCompletedTypeOrNull(Ty);
 
-  if (T.Verify()) {
+  if (T.isType()) {
     // If we're looking for a definition, make sure we have definitions of any
     // underlying types.
     if (const TypedefType* TTy = dyn_cast<TypedefType>(Ty))
