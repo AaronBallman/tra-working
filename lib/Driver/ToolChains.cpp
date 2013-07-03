@@ -1063,16 +1063,10 @@ Generic_GCC::GCCInstallationDetector::GCCInstallationDetector(
                                                 "aarch64-linux-gnu" };
 
   static const char *const ARMLibDirs[] = { "/lib" };
-  static const char *const ARMTriples[] = {
-    "arm-linux-gnueabi",
-    "armv5tel-suse-linux-gnueabi",
-    "arm-linux-androideabi"
-  };
-  static const char *const ARMHFTriples[] = {
-    "arm-linux-gnueabihf",
-    "armv7hl-suse-linux-gnueabi",
-    "armv7hl-redhat-linux-gnueabi"
-  };
+  static const char *const ARMTriples[] = { "arm-linux-gnueabi",
+                                            "arm-linux-androideabi" };
+  static const char *const ARMHFTriples[] = { "arm-linux-gnueabihf",
+                                              "armv7hl-redhat-linux-gnueabi" };
 
   static const char *const X86_64LibDirs[] = { "/lib64", "/lib" };
   static const char *const X86_64Triples[] = {
